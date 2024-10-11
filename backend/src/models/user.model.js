@@ -1,4 +1,6 @@
 import mongoose, { Schema } from "mongoose";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 const userSchema = new Schema({
   name: {
@@ -17,6 +19,10 @@ const userSchema = new Schema({
     type: String,
     required: [true, "password is required"],
   },
+  Cart: {
+    type: Schema.Types.ObjectId,
+    ref: "Cart",
+  },
   refreshToken: {
     type: String,
   },
@@ -25,17 +31,17 @@ const userSchema = new Schema({
 //Hashing Password before saving
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next;
-  this.password = bcrypt.hash(this.password, 10);
+  this.password = await bcrypt.hash(this.password, 10);
   next();
 });
 
 userSchema.methods.isPasswordCorrect = async function (password) {
-  await bcrypt.compare(password, this.password);
+  return await bcrypt.compare(password, this.password);
 };
 
 //Hook to generate Access Token
 userSchema.methods.generateAccessToken = function () {
-  jsw.sign(
+  return jwt.sign(
     {
       _id: this._id,
       email: this.email,
@@ -51,13 +57,13 @@ userSchema.methods.generateAccessToken = function () {
 
 //Hook to generate Refresh Token
 userSchema.methods.generateRefreshToken = function () {
-  jsw.sign(
+  return jwt.sign(
     {
       _id: this._id,
     },
     process.env.REFRESH_TOKEN_SECRET,
     {
-      expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
+      expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
     }
   );
 };
