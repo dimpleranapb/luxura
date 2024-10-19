@@ -11,14 +11,30 @@ const productSchema = new Schema ( {
         trim: true
 
     },
+    image: {
+        type: Array,
+        required: true
+    },
     description :{
         type: String,
         required: true,
         trim: true
     },
     size: {
-        type:String,
+        type:Array,
         required: true
+    },
+    category: {
+        type: String,
+        required: true
+    },
+    subCategory: {
+        type: String,
+        required: true,
+    },
+    bestSeller: {
+        type: Boolean,
+        default: false
     },
     reviews: {
         type: Schema.Type.ObjectId,
@@ -27,4 +43,6 @@ const productSchema = new Schema ( {
     
 })
 
-export const Product = mongoose.model( 'Product', productSchema);
+const Product = mongoose.model( 'Product', productSchema);
+
+export default Product;

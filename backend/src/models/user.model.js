@@ -19,14 +19,14 @@ const userSchema = new Schema({
     type: String,
     required: [true, "password is required"],
   },
-  Cart: {
-    type: Schema.Types.ObjectId,
-    ref: "Cart",
+  cart: {
+    type: Object,
+    default: {}
   },
   refreshToken: {
     type: String,
   },
-});
+},{minimize: false});
 
 //Hashing Password before saving
 userSchema.pre("save", async function (next) {
@@ -39,7 +39,7 @@ userSchema.methods.isPasswordCorrect = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
 
-//Hook to generate Access Token
+// generating Access Token
 userSchema.methods.generateAccessToken = function () {
   return jwt.sign(
     {
@@ -55,7 +55,7 @@ userSchema.methods.generateAccessToken = function () {
   );
 };
 
-//Hook to generate Refresh Token
+//generating Refresh Token
 userSchema.methods.generateRefreshToken = function () {
   return jwt.sign(
     {
@@ -67,4 +67,7 @@ userSchema.methods.generateRefreshToken = function () {
     }
   );
 };
-export const User = mongoose.model("User", userSchema);
+
+const User = mongoose.model("User", userSchema);
+
+export default User;
